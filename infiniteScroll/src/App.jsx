@@ -11,12 +11,13 @@ function App() {
     window.addEventListener("scroll",handleScroll);
 
     return ()=> window.removeEventListener("scroll", handleScroll);
-    
+
   },[])
 
   const handleScroll = ()=> {
-    if(window.scrollY + window.innerHeight >=document.body.scrollHeight)
+    if(window.scrollY + window.innerHeight >=document.body.scrollHeight-1)
     {
+      console.log("fetch Data");
       fetchMemes();
     }
   }
