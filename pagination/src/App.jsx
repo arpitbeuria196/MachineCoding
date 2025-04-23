@@ -14,58 +14,72 @@ function App() {
 
   const lastIndex = startIndex+ total_content;
 
-  
+
+  const totalPages = Math.ceil(memeData.length / total_content);
 
   useEffect(()=>{
     fetchData();
   },[currentPage])
 
-  const handleNext = ()=>
-  {
-    setCurrentPage(prev => (prev+1)%total_content);
-    console.log(currentPage);
+  const handleNext = () => {
+    setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
   }
-  const handlePrev = ()=>
-  {
-    setCurrentPage((prev) =>{
-      return prev = prev == 0 ? 4 : prev-1;
-    });
-
-    console.log(currentPage);
-  }
+  const handlePrev = () => {
+    setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev));
+  };
 
   const fetchData = async ()=>
   {
-    const data = await fetch(`https://meme-api.com/gimme/${total_content}`);
+    const data = await fetch("https://meme-api.com/gimme/50");
     const convertData = await data.json();
     setMemeData(convertData.memes);
     console.log(convertData);
   }
 
+  const pages = Array(totalPages).fill(0).map((_,i)=> i+1);
+
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
+    <div className="min-h-screen bg-gray-100 py-10 px-4 flex">
+      <div className='flex flex-col'>
       <button onClick={handlePrev}>⬅️</button>
+      {
+        pages.map((val,index)=>(
+          <button onClick={()=> setCurrentPage(val)}>
+            {val}
+          </button>
+        ))
+      }
       <button onClick={handleNext}>➡️</button>
+      </div>
       <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">🔥 Meme Gallery</h1>
   
-      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {memeData.length > 0 &&
-          memeData.slice(startIndex,lastIndex).map((meme, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105"
-            >
-              <img
-                src={meme.url}
-                alt={`meme-${index}`}
-                className="w-full h-[100px] object-cover"
-              />
-              <div className="px-2 py-1">
-                <p className="text-xs text-gray-700 truncate">{meme.title}</p>
-              </div>
-            </div>
-          ))}
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2">
+  {memeData.length > 0 &&
+    memeData.slice(startIndex, lastIndex).map((meme, index) => (
+      <div
+        key={`${meme.id || index}-${currentPage}`}
+        className="bg-white rounded-lg shadow-xs overflow-hidden transition-transform duration-200 hover:scale-105 hover:shadow-sm border border-gray-100"
+      >
+        <div className="aspect-square"> {/* Ensures square cards */}
+          <img
+            src={meme.url}
+            alt={meme.title || `Meme ${index}`}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div className="p-1">
+          <p className="text-[10px] text-gray-700 truncate px-1">
+            {meme.title || "Untitled"}
+          </p>
+          <p className="text-[8px] text-gray-400 truncate px-1">
+            r/{meme.subreddit || 'meme'}
+          </p>
+        </div>
       </div>
+    ))}
+</div>
+
     </div>
   );
   
