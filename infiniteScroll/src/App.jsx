@@ -47,6 +47,7 @@ function App() {
               memes.map((meme,index)=>(
                 <div key={index}>
                   <img
+                  
                   src={meme.url}
                   />
                 </div>
